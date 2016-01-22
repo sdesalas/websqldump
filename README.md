@@ -1,5 +1,5 @@
 # websqldump
-A minimal JS library for exporting data out of WebSQL
+An ultra-light JS library for exporting data out of WebSQL
 
 
 ## Usage

@@ -5,12 +5,14 @@ An ultra-light JS library for exporting data out of WebSQL
 ## Usage
 
 ```
+// Export to console
 websqldump.export({
   database: 'NorthwindLite'
 });
 ```
 
 ```
+// Export to alert window
 websqldump.export({
   database: 'NorthwindLite',
   dataonly: true,

@@ -50,4 +50,4 @@ websqldump({
 - **schemaonly**: Set to true to get the schema only (defaults to false)
 - **dataonly**: Set to true to get the data only (defaults to false)
 - **success**: Callback with 1 parameter (sql output). If not available will output to console.
-- **error**: Callback with 1 parameter (err message). If not available will throw an exception.
+- **error**: Callback with 1 parameter (err message). If not available on error will throw an exception.

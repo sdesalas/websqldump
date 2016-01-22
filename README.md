@@ -9,14 +9,14 @@ An ultra-light JS library for exporting data out of WebSQL
 
 ```
 // Export whole db to console
-websqldump({
+websqldump.export({
   database: 'NorthwindLite'
 });
 ```
 
 ```
 // Export database data and POST to remote server
-websqldump({
+websqldump.export({
   database: 'NorthwindLite',
   dataonly: true,
   linebreaks: true,
@@ -28,7 +28,7 @@ websqldump({
 
 ```
 // Export single table (schema only) to alert window, ignore errors
-websqldump({
+websqldump.export({
   database: 'NorthwindLite',
   table: 'Orders',
   schemaonly: true,
@@ -42,8 +42,7 @@ websqldump({
 });
 ```
 
-
-### Configuration options
+### Export options
 
 - **database**: Required. The name of the database to export
 - **table**: The table to export, if undefined then all tables are exported (defaults to undefined)

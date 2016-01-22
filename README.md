@@ -5,16 +5,17 @@ An ultra-light JS library for exporting data out of WebSQL
 ## Usage
 
 ```
-// Export to console
+// Export whole db to console
 websqldump.export({
   database: 'NorthwindLite'
 });
 ```
 
 ```
-// Export to alert window
+// Export single table data to alert window
 websqldump.export({
   database: 'NorthwindLite',
+  table: 'Orders',
   dataonly: true,
   linebreaks: true,
   success: function(sql) {

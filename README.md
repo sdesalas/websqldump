@@ -12,17 +12,33 @@ websqldump({
 ```
 
 ```
-// Export single table data to alert window
+// Export database data and POST to remote server
 websqldump({
   database: 'NorthwindLite',
-  table: 'Orders',
   dataonly: true,
   linebreaks: true,
   success: function(sql) {
-    alert(sql); 
+    $.ajax({type: 'POST', url: 'http://myserver.com/sync', data: {clientId: '4EAB0319', localdb: sql});
   }
 });
 ```
+
+```
+// Export single table (schema only) to alert window, ignore errors
+websqldump({
+  database: 'NorthwindLite',
+  table: 'Orders',
+  schemaonly: true,
+  linebreaks: true,
+  success: function(sql) {
+    alert(sql); 
+  },
+  error: function(msg) {
+    // do nothing
+  }
+});
+```
+
 
 ### Configuration options
 

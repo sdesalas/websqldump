@@ -46,7 +46,7 @@ websqldump({
 ### Configuration options
 
 - **database**: Required. The name of the database to export
-- **table**: The table to export, if null then all tables are exported (defaults to null)
+- **table**: The table to export, if undefined then all tables are exported (defaults to undefined)
 - **version**: The version of the web database (defaults to '1.0')
 - **dbsize**: The size of the database in bytes (defaults to 5 * 1024 * 1024 - ie 5MB)
 - **linebreaks**: Set to true to add line-breaks (defaults to false)

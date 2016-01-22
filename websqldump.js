@@ -147,8 +147,10 @@ wd.execute = function(config) {
 	});
 };
 
-window.websqldump = function() {
-	wd.export.apply(wd, arguments);
+window.websqldump = {
+	export: function() {
+		wd.export.apply(wd, arguments);
+	}
 };
 
 })(this);

@@ -42,11 +42,9 @@ wd.exportTable = function(config) {
 					if (typeof(config.error) === "function") config.error('No such table: ' + table);
 					return;
 				}
-				if (!config.dataonly) {
-					config.exportSql.push(results.rows.item(0)["sql"]);
-				}
+				config.exportSql.push(results.rows.item(0)["sql"]);
 				if (config.schemaonly) {
-					if (typeof(config.success) === "function") config.success(config.exportSql.join(config.linebreaks ? '\n' : '') + ';');
+					if (typeof(config.success) === "function") config.success(config.exportSql.toString());
 					return;
 				}
 			}
@@ -70,7 +68,7 @@ wd.exportTable = function(config) {
 						config.exportSql.push("INSERT INTO " + table + "(" + _fields.join(",") + ") VALUES (" + _values.join(",") + ")");
 					}
 				}
-				if (typeof(config.success) === "function") config.success(config.exportSql.join(config.linebreaks ? ';\n' : '; ') + ';');
+				if (typeof(config.success) === "function") config.success(config.exportSql.toString());
 			},
 			error: function(err) {
 				if (typeof(config.error) === "function") config.error(err);
@@ -86,6 +84,7 @@ wd.export = function(config) {
 	}
 	config.db = wd.open(config);
 	config.exportSql = config.exportSql || [];
+	config.exportSql.toString = function() {return this.join(config.linebreaks ? ';\n' : '; ') + ';';}
 	if (config.table) {
 		wd.exportTable(config);
 	} else {
@@ -95,7 +94,7 @@ wd.export = function(config) {
 			config.exported.push(config.table);
 			// Check if its all done
 			if (config.exported.length >= config.outstanding.length) {
-				if (typeof(success) === "function") success(config.exportSql.join(config.linebreaks ? ';\n' : '; ') + ';');
+				if (typeof(success) === "function") success(config.exportSql.toString());
 			}
 		}
 		// Export all tables in db
@@ -117,7 +116,6 @@ wd.export = function(config) {
 						wd.exportTable(config);
 					}
 				}
-				if (typeof(success) === "function") success(config.exportSql.join(config.linebreaks ? ';\n' : '; ') + ';');
 			},
 			error: function(err) {
 				if (typeof(error) === "function") error(transaction, err);
@@ -149,10 +147,8 @@ wd.execute = function(config) {
 	});
 };
 
-window.websqldump = {
-	export: function() {
-		wd.export.apply(wd, arguments);
-	}
+window.websqldump = function() {
+	wd.export.apply(wd, arguments);
 };
 
 })(this);

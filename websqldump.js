@@ -54,7 +54,7 @@ wd.exportTable = function(config) {
 	if (!config.schemaonly) {
 		wd.execute({
 			db: config.db,
-			sql: "SELECT * FROM " + table + ";", 
+			sql: "SELECT * FROM '" + table + "';", 
 			success: function(results) {
 				if (results.rows && results.rows.length) {
 					for (var i = 0; i < results.rows.length; i++) {

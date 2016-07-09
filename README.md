@@ -1,6 +1,6 @@
 # websqldump
 
-![WebSQLDump Logo](https://raw.githubusercontent.com/sdesalas/websqldump/master/img/logo.whitebg.png)
+![WebSQLDump Logo](https://raw.githubusercontent.com/sdesalas/websqldump/master/img/logo.whitebg.420px.png)
 
 An ultra-light JS library for exporting data out of WebSQL
 

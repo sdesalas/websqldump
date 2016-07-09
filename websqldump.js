@@ -61,7 +61,7 @@ wd.exportTable = function(config) {
 						var row = results.rows.item(i);
 						var _fields = [];
 						var _values = [];
-						for (col in row) {
+						for (var col in row) {
 							_fields.push(col);
 							_values.push('"' + row[col] + '"');
 						}

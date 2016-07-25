@@ -51,3 +51,7 @@ websqldump.export({
 - **dataonly**: Set to true to get the data only (defaults to false)
 - **success**: Callback with 1 parameter (sql output). If not available will output to console.
 - **error**: Callback with 1 parameter (err message). If not available on error will throw an exception.
+
+### Dependencies
+
+No JavaScript library dependencies. Requires browser with HTML5 WebSql support (such as WebKit browsers like chrome and safari) or equivalent `openDatabase` polyfill. 

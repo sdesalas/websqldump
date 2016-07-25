@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Websqldump by sdesalas</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/github-light.css">
+    <meta name="viewport" content="width=device-width">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>Websqldump</h1>
+        <p>An ultra-light JS library for exporting data out of WebSQL</p>
+
+        <p class="view"><a href="https://github.com/sdesalas/websqldump">View the Project on GitHub <small>sdesalas/websqldump</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/sdesalas/websqldump/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/sdesalas/websqldump/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/sdesalas/websqldump">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <p><img src="https://raw.githubusercontent.com/sdesalas/websqldump/master/img/logo.whitebg.420px.png" alt="WebSQLDump Logo"></p>
+
+<p>An ultra-light JS library for exporting data out of WebSQL</p>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
+
+<pre><code>// Export whole db to console
+websqldump.export({
+  database: 'NorthwindLite'
+});
+</code></pre>
+
+<pre><code>// Export database data and POST to remote server
+websqldump.export({
+  database: 'NorthwindLite',
+  dataonly: true,
+  linebreaks: true,
+  success: function(sql) {
+    $.ajax({type: 'POST', url: 'http://myserver.com/sync', data: {clientId: '4EAB0319', localdb: sql});
+  }
+});
+</code></pre>
+
+<pre><code>// Export single table (schema only) to alert window, ignore errors
+websqldump.export({
+  database: 'NorthwindLite',
+  table: 'Orders',
+  schemaonly: true,
+  linebreaks: true,
+  success: function(sql) {
+    alert(sql); 
+  },
+  error: function(msg) {
+    // do nothing
+  }
+});
+</code></pre>
+
+<h3>
+<a id="export-options" class="anchor" href="#export-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Export options</h3>
+
+<ul>
+<li>
+<strong>database</strong>: Required. The name of the database to export</li>
+<li>
+<strong>table</strong>: The table to export, if undefined then all tables are exported (defaults to undefined)</li>
+<li>
+<strong>version</strong>: The version of the web database (defaults to '1.0')</li>
+<li>
+<strong>dbsize</strong>: The size of the database in bytes (defaults to 5 * 1024 * 1024 - ie 5MB)</li>
+<li>
+<strong>linebreaks</strong>: Set to true to add line-breaks (defaults to false)</li>
+<li>
+<strong>schemaonly</strong>: Set to true to get the schema only (defaults to false)</li>
+<li>
+<strong>dataonly</strong>: Set to true to get the data only (defaults to false)</li>
+<li>
+<strong>success</strong>: Callback with 1 parameter (sql output). If not available will output to console.</li>
+<li>
+<strong>error</strong>: Callback with 1 parameter (err message). If not available on error will throw an exception.</li>
+</ul>
+
+<h3>
+<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h3>
+
+<p>No JavaScript library dependencies. Requires browser with HTML5 WebSql support (such as WebKit browsers like chrome and safari) or equivalent <code>openDatabase</code> polyfill. </p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/sdesalas">sdesalas</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+    
+  </body>
+</html>

@@ -55,3 +55,9 @@ websqldump.export({
 ### Dependencies
 
 No JavaScript library dependencies. Requires browser with HTML5 WebSql support (such as WebKit browsers like chrome and safari) or equivalent `openDatabase` polyfill. 
+
+### Demo
+
+The following page contains a test harness:
+
+[http://sdesalas.github.io/websqldump](http://sdesalas.github.io/websqldump)

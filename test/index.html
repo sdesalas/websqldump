@@ -32,7 +32,8 @@
 				<div class="object database"><input type="text" name="dbName" value="{0}" class="big bold" onchange="$changeDb(this)"><br/>{1}</div>
 				<h2>Tables</h2>
 				{2}
-				<a href="javascript:$navigate('addTable');" class="button">Add  Table</a>
+				<a href="javascript:$navigate('addTable');" class="button left">Add Table</a>
+				<a href="javascript:$generateDump();" class="button right">Generate Dump</a>
 				<h2>Sys Tables</h2>
 				<ul>
 					<li><a class='block' href='javascript:$viewTable("sqlite_master")'>sqlite_master</a></li>
@@ -42,6 +43,26 @@
 				<ul><li><textarea id="{3}" style="height:80px;"></textarea></li></ul>
 				<a href="javascript:$executeSql();" class="button left">Execute</a>
 				<a href="javascript:$navigate('main');" class="button right">Cancel</a><br/>
+			</div>
+			<!-- WebSQLDump Dialog -->
+			<div id="generateDump">
+				<div class='object database'>
+					<b>Generate Dump</b><br/>
+				</div>
+				<h2 style="clear:none">Tables</h2>
+				{0}
+				<h2>Options</h2>
+				<ul>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'linebreaks');">Line Breaks</label></li>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'schemaonly');">Schema Only</label></li>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'dataonly');">Data Only</label></li>
+				</ul>
+				<h2>WebSQLDump Code</h2>
+				<ul><li><textarea id="websqldumpCode" style="height:160px;font-size:90%;">{1}</textarea></li></ul>
+				<a href="javascript:$executeDump();" class="button left">Execute</a>
+				<a href="javascript:$navigate('openDb');" class="button right">Back</a>
+				<h2>Output</h2>
+				<ul><li><textarea id="websqldumpOutput" style="height:200px;font-size:90%;"></textarea></li></ul>
 			</div>
 			<!-- Add Table Dialog -->
 			<div id="addTable">

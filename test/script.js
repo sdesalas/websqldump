@@ -34,6 +34,9 @@ SqlClient.init = function() {
 	$execute = SqlClient.execute;
 	$executeSql = SqlClient.executeSql;
 	$exportTable = SqlClient.exportTable;
+	$generateDump = SqlClient.generateDump;
+	$toggleDump = SqlClient.toggleDump;
+	$executeDump = SqlClient.executeDump;
 	// Event listeners
 	$focus = function(obj) {if (!obj.oldvalue || obj.oldvalue == obj.value) {obj.oldvalue = obj.value; obj.value = '';}};
 	$blur = function(obj) {if (!obj.value) obj.value = obj.oldvalue;;};
@@ -355,6 +358,48 @@ SqlClient.exportTable = function() {
 	}
 };
 
+SqlClient.generateDump = function() {
+	$log("SqlClient.generateDump()");
+	SqlClient.generateDump.table = undefined;
+	SqlClient.generateDump.options = [];
+	$navigate('generateDump');
+};
+
+SqlClient.toggleDump = function(type, name) {
+	$log("SqlClient.toggleDump('"+ type + "', '" + name + "')");
+	var table = SqlClient.generateDump.table;
+	var options = SqlClient.generateDump.options;
+	switch(type) {
+		case 'table':
+			table = name;
+			break;
+		case 'option':
+			if (options.indexOf(name) > -1) options.splice(options.indexOf(name), 1);
+			else options.push(name);
+		break;
+	}
+	var exportOptions = {
+		database: SqlClient.dbInit.dbName,
+		success: "{{success}}",
+		table: table
+	};
+	options.forEach(function(opt) {
+		exportOptions[opt] = true;
+	});
+	var optionsStr = JSON.stringify(exportOptions, null, 2).replace('\"{{success}}\"', "function(sql) {\n    var output = document.getElementById('websqldumpOutput');\n   output.value = sql;\n  }")
+	var result = "websqldump.export(" + optionsStr + ");";
+	var websqldumpCode = $get('websqldumpCode');
+	if (websqldumpCode) websqldumpCode.value = result;
+	return result;
+};
+
+SqlClient.executeDump = function() {
+	$log("SqlClient.executeDump()");
+	var code = $get('websqldumpCode').value;
+	var func = new Function(code);
+	func.call();
+};
+
 // Helper method for executing SQL code in DB
 SqlClient.execute = function(sql, params, callback) {
 	$log("SqlClient.execute(sql, params)", sql);
@@ -508,17 +553,37 @@ SqlClient.navigate = function(section) {
 				);
 			});
 			break;
+		case 'generateDump':
+			$connect();
+			SqlClient.db.transaction(function(transaction) {
+				// SQL: Show Tables in Database
+				SqlClient.currentQuery = "SELECT name FROM sqlite_master WHERE type='table' ORDER BY name;";
+				transaction.executeSql(SqlClient.currentQuery, [],
+					function(transaction, results) {
+						if (results.rows.length) {
+							var _tables = "<ul>";
+							 for (var i=0; i<results.rows.length; i++) {
+							      // Each row is a standard JavaScript array indexed by column names.
+							      var row = results.rows.item(i);
+								  if (row['name'] != "__WebKitDatabaseInfoTable__")
+							      	_tables += "<li><input type='radio' name='table' id='" + row['name'] + "' onchange='$toggleDump(\"table\", this.id)' style='float: right;'><a class='block' href='javascript:$toggleDump(\"table\", \"" + row['name'] + "\")' style='width:90%'>" + row['name'] + "</a></li>";
+							}
+							_tables += "</ul>";
+						} 
+						if (!_tables || _tables == "<ul></ul>") 
+							_tables = "<ul><li>There are no tables in the database.</li></ul>";
+						SqlClient.show("generateDump", [_tables, $toggleDump()]);
+					}, 
+					function(transaction, error) {
+						$log(error);
+						SqlClient.show("tblError", [SqlClient.dbInit.dbName, SqlClient.dbInit.dbVer, SqlClient.currentQuery, error.message]);
+					}
+				);
+			});
+			break;
 		default:
 			if (typeof (window.openDatabase) != "undefined")
-				SqlClient.show("main", 
-					[
-						navigator.userAgent, 
-						"green",
-						"enabled", 
-						"All Ready!",
-						"<p>You can disconnect from the network  now.</p><a href='javascript:$navigate(\"openDb\");' class='button'>Continue</a>"
-					]
-				)
+				$navigate("openDb");
 			else 
 				SqlClient.show("main", 
 					[

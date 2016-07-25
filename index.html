@@ -1,107 +1,133 @@
-<!doctype html>
+
 <html>
-  <head>
-    <meta charset="utf-8">
-    <meta http-equiv="X-UA-Compatible" content="chrome=1">
-    <title>Websqldump by sdesalas</title>
-
-    <link rel="stylesheet" href="stylesheets/styles.css">
-    <link rel="stylesheet" href="stylesheets/github-light.css">
-    <meta name="viewport" content="width=device-width">
-    <!--[if lt IE 9]>
-    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
-    <![endif]-->
-  </head>
-  <body>
-    <div class="wrapper">
-      <header>
-        <h1>Websqldump</h1>
-        <p>An ultra-light JS library for exporting data out of WebSQL</p>
-
-        <p class="view"><a href="https://github.com/sdesalas/websqldump">View the Project on GitHub <small>sdesalas/websqldump</small></a></p>
-
-
-        <ul>
-          <li><a href="https://github.com/sdesalas/websqldump/zipball/master">Download <strong>ZIP File</strong></a></li>
-          <li><a href="https://github.com/sdesalas/websqldump/tarball/master">Download <strong>TAR Ball</strong></a></li>
-          <li><a href="https://github.com/sdesalas/websqldump">View On <strong>GitHub</strong></a></li>
-        </ul>
-      </header>
-      <section>
-        <p><img src="https://raw.githubusercontent.com/sdesalas/websqldump/master/img/logo.whitebg.420px.png" alt="WebSQLDump Logo"></p>
-
-<p>An ultra-light JS library for exporting data out of WebSQL</p>
-
-<h2>
-<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Usage</h2>
-
-<pre><code>// Export whole db to console
-websqldump.export({
-  database: 'NorthwindLite'
-});
-</code></pre>
-
-<pre><code>// Export database data and POST to remote server
-websqldump.export({
-  database: 'NorthwindLite',
-  dataonly: true,
-  linebreaks: true,
-  success: function(sql) {
-    $.ajax({type: 'POST', url: 'http://myserver.com/sync', data: {clientId: '4EAB0319', localdb: sql});
-  }
-});
-</code></pre>
-
-<pre><code>// Export single table (schema only) to alert window, ignore errors
-websqldump.export({
-  database: 'NorthwindLite',
-  table: 'Orders',
-  schemaonly: true,
-  linebreaks: true,
-  success: function(sql) {
-    alert(sql); 
-  },
-  error: function(msg) {
-    // do nothing
-  }
-});
-</code></pre>
-
-<h3>
-<a id="export-options" class="anchor" href="#export-options" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Export options</h3>
-
-<ul>
-<li>
-<strong>database</strong>: Required. The name of the database to export</li>
-<li>
-<strong>table</strong>: The table to export, if undefined then all tables are exported (defaults to undefined)</li>
-<li>
-<strong>version</strong>: The version of the web database (defaults to '1.0')</li>
-<li>
-<strong>dbsize</strong>: The size of the database in bytes (defaults to 5 * 1024 * 1024 - ie 5MB)</li>
-<li>
-<strong>linebreaks</strong>: Set to true to add line-breaks (defaults to false)</li>
-<li>
-<strong>schemaonly</strong>: Set to true to get the schema only (defaults to false)</li>
-<li>
-<strong>dataonly</strong>: Set to true to get the data only (defaults to false)</li>
-<li>
-<strong>success</strong>: Callback with 1 parameter (sql output). If not available will output to console.</li>
-<li>
-<strong>error</strong>: Callback with 1 parameter (err message). If not available on error will throw an exception.</li>
-</ul>
-
-<h3>
-<a id="dependencies" class="anchor" href="#dependencies" aria-hidden="true"><span aria-hidden="true" class="octicon octicon-link"></span></a>Dependencies</h3>
-
-<p>No JavaScript library dependencies. Requires browser with HTML5 WebSql support (such as WebKit browsers like chrome and safari) or equivalent <code>openDatabase</code> polyfill. </p>
-      </section>
-      <footer>
-        <p>This project is maintained by <a href="https://github.com/sdesalas">sdesalas</a></p>
-        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
-      </footer>
-    </div>
-    <script src="javascripts/scale.fix.js"></script>
-    
-  </body>
+	<head>
+		<title>WebSQLdump Test Harness</title>
+		<meta name="viewport" content="width=device-width, minimum-scale=1.0, maximum-scale=1.0" />
+		<script language="javascript" src="script.js"></script>
+		<script language="javascript" src="https://raw.githubusercontent.com/sdesalas/websqldump/master/websqldump.js"></script>
+		<link rel="stylesheet" type="text/css" href="styles.css" />
+	</head>
+	<body>
+		<div id="header">WebSQLdump Test</div>
+		<div id="content">
+			<!-- Dynamic content goes here -->
+			<noscript><br/>Your Browser does not have JavaScript enabled.<br/>Please enable Javascript or use a different browser</noscript>
+			<!-- Preload images -->
+			<img src="database.png" style="width:0px"/>
+			<img src="delete.gif" style="width:0px" />
+			<img src="table.png" style="width: 0px" />
+		</div>
+		<div id="content-options">
+			<!-- Starting Point -->
+			<div id="main">
+				<h2>User Agent</h2>
+				<p>Your current browser is {0}</p>
+				<h2>Supported Functionality</h2>
+				<p>- window<b>.openDatabase</b> is <span class="{1}">{2}</span></p>
+				<h2>{3}</h2>
+				{4}
+			</div>
+			<!-- Open Database Dialog -->
+			<div id="openDb">
+				<div class="object database"><input type="text" name="dbName" value="{0}" class="big bold" onchange="$changeDb(this)"><br/>{1}</div>
+				<h2>Tables</h2>
+				{2}
+				<a href="javascript:$navigate('addTable');" class="button left">Add Table</a>
+				<a href="javascript:$generateDump();" class="button right">Generate Dump</a>
+				<h2>Sys Tables</h2>
+				<ul>
+					<li><a class='block' href='javascript:$viewTable("sqlite_master")'>sqlite_master</a></li>
+					<li><a class='block' href='javascript:$viewTable("sqlite_temp_master")'>sqlite_temp_master</a></li>
+				</ul>
+				<h2>SQL Query</h2>
+				<ul><li><textarea id="{3}" style="height:80px;"></textarea></li></ul>
+				<a href="javascript:$executeSql();" class="button left">Execute</a>
+				<a href="javascript:$navigate('main');" class="button right">Cancel</a><br/>
+			</div>
+			<!-- WebSQLDump Dialog -->
+			<div id="generateDump">
+				<div class='object database'>
+					<b>Generate Dump</b><br/>
+				</div>
+				<h2 style="clear:none">Tables</h2>
+				{0}
+				<h2>Options</h2>
+				<ul>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'linebreaks');">Line Breaks</label></li>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'schemaonly');">Schema Only</label></li>
+					<li><label style="width: 100%;"><input type="checkbox" onchange="$toggleDump('option', 'dataonly');">Data Only</label></li>
+				</ul>
+				<h2>WebSQLDump Code</h2>
+				<ul><li><textarea id="websqldumpCode" style="height:160px;font-size:90%;">{1}</textarea></li></ul>
+				<a href="javascript:$executeDump();" class="button left">Execute</a>
+				<a href="javascript:$navigate('openDb');" class="button right">Back</a>
+				<h2>Output</h2>
+				<ul><li><textarea id="websqldumpOutput" style="height:200px;font-size:90%;"></textarea></li></ul>
+			</div>
+			<!-- Add Table Dialog -->
+			<div id="addTable">
+				<div class='object table'>
+					<b>Add Table</b><br/>
+				</div>
+				<ul><li><label>Name</label><input type="text" name="{0}" value="Table Name" onfocus="$focus(this)" onblur="$blur(this)"/></li></ul>
+				<ul id="{1}"><li>No columns</li></ul>
+				<h2>New Column</h2>
+				<ul>
+					<li><label>Name</label><input id="{2}" type="text" name="{2}" value="Column Name"  onfocus="$focus(this)" onblur="$blur(this)"/></li>
+					<li><label>Data Type</label><select id="{3}" name="{3}"><option>TEXT</option><option>INTEGER</option><option>TIMESTAMP</option><option>FLOAT</option><option>BOOLEAN</option></select></li>
+					<li><label>Null</label><input id="{4}-1" type="radio" name="{4}" value="Yes" checked="true"/>Yes <input id="{4}-2" type="radio" name="{4}" value="No"/>No</li>
+					<li><label>Primary Key</label><input id="{5}-1" type="radio" name="{5}" value="Yes"/>Yes <input id="{5}-2" type="radio" name="{5}" value="No" checked="true"/>No</li>
+				</ul>
+				<a href="javascript:$addColumn();" class="button">Add Column</a>
+				<h2>Options</h2>
+				<a href="javascript:$addTable();" class="button left">Create Table</a>
+				<a href="javascript:$navigate('openDb');" class="button right">Cancel</a><br/>
+			</div>
+			<!-- View Table Dialog -->
+			<div id="viewTable">
+				<div class='object table'>
+					<b>{0}</b><br/>
+				</div>
+				{1}
+				{2}
+				<h2>Options</h2>
+				<a href="javascript:$truncate();" class="button left">Truncate</a>
+				<a href="javascript:$exportTable();" class="button right">Export</a><br/><br/>
+				<a href="javascript:$dropTable();" class="button left">Drop Table</a>
+				<a href="javascript:$navigate('openDb');" class="button right">Cancel</a><br/><br/>
+			</div>
+			<!-- Execute SQL Results -->
+			<div id="executeSqlResults">
+				<div class="object database"><b>{0}</b><br/></div>
+				<h2>Query:</h2>
+				<pre>{1}</pre>
+				{3}
+				<p><i>{2}</i><br/></p>
+				<a href="javascript:$navigate('openDb');" class="button">Ok</a><br/>
+			</div>
+			<!-- Execute SQL Results -->
+			<div id="exportTable">
+				<div class="object table"><b>{0}</b><br/></div>
+				<h2>Export Table:</h2>
+				<pre>{1}</pre><br/>
+				<a href="javascript:$navigate('openDb');" class="button">Ok</a><br/>
+			</div>
+			<!-- Open Database Error -->
+			<div id="dbError">
+				<div class="object database"><b>{0}</b><br/></div>
+				<h2><span class='red'>Error:</span></h2>
+				<p>There was a problem opening the database: {0}<p/>
+			</div>
+			<!-- List Tables Error -->
+			<div id="tblError">
+				<div class="object database"><b>{0}</b><br/>{1}</div>
+				<h2><span class='red'>Query Error:</span></h2>
+				<pre>{2}</pre>
+				<p>The following problem occurred executing SQL: </p>
+				<p style="padding-left:10px;"><i>{3}</i><br/></p>
+				<a href="javascript:$navigate('openDb');" class="button">Ok</a><br/>
+			</div>
+		</div>
+		<div id="footer"></div>
+	</body>
 </html>

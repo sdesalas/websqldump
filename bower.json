@@ -1,0 +1,22 @@
+{
+  "name": "websqldump",
+  "authors": [
+    "steven@desalasworks.com"
+  ],
+  "description": "An ultra-light JS library for exporting data out of WebSQL",
+  "main": "websqldump.js",
+  "keywords": [
+    "Backup",
+    "WebSQL",
+    "dump"
+  ],
+  "license": "MIT",
+  "homepage": "https://github.com/sdesalas/websqldump",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ]
+}

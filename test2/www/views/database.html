@@ -1,0 +1,80 @@
+<!-- DATABASE VIEW -->
+<form id="database">
+  <style>
+    form#database header { background: transparent url(img/database.png) no-repeat left top; padding-left: 60px; }
+    form#database input[name=name] { padding: 1px 2px; font-weight: bold;}
+    form#database li.list-group-item[data-action] { cursor: pointer;}
+    form#database li.list-group-item[data-action]:hover { background-color: #dee7ef;}
+    form#database .sql-editor { height: 200px; margin-bottom: 20px; font-weight: bold; font-family: "Courier New", courier, monospace; }
+  </style>
+  <header>
+    <input type="text" name="name" value="{{name}}"><br/>
+    {{version}}
+  </header>
+  <h2>Tables</h2>
+  <ul class="list-group">
+  {{#each tables}}
+  <li class="list-group-item" data-action="viewTable">{{.}}</li>
+  {{else}}
+  <li class="list-group-item">No tables</li>
+  {{/each}}
+  </ul>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="addTable">Add Table</a>
+    <a class="btn btn-default" href="javascript:;" data-action="generateDump">Generate Dump</a>
+  </div>
+
+  <h2>Sys Tables</h2>
+  <ul class="list-group">
+    <li class="list-group-item"><a href="javascript:;" data-action="viewTable">sqlite_master</a></li>
+    <li class="list-group-item"><a href="javascript:;" data-action="viewTable">sqlite_temp_master</a></li>
+  </ul>
+  <h2>SQL Query</h2>
+  <textarea class="sql-editor form-control"></textarea>
+  <div class="btn-group btn-group-justified">
+      <a class="btn btn-default" href="javascript:;" data-action="executeSql" class="button">Execute</a>
+  </div>
+</form>
+
+<script>
+window.app = window.app || {};
+window.app.views = window.app.views || {};
+window.app.views.database = window.views.Base.extend({
+  el: $('#database'),
+  initialize: function (model) {
+    console.log('views.database.initialize()');
+    this.model = model;
+    this.template = Handlebars.compile(this.el.innerHTML);
+    this.render();
+  },
+  events: {
+    "click [data-action]": "route",
+    "change input": "change",
+    "change select": "change"
+  },
+  refresh: function() {
+    this.model.loadSchema((function() {
+      this.render();
+    }).bind(this));
+  },
+  actions: {
+    addTable: function() {
+      console.log('views.database.addTable()');
+      app.router.navigate('table/new', {trigger: true});
+    },
+    viewTable: function(target) {
+      console.log('views.database.viewTable()');
+      var name = target.innerText;
+      if (name) {
+        app.router.navigate('table/' + name, {trigger: true});
+      }
+    },
+    generateDump: function() {
+      console.log('views.database.generateDump()');
+    },
+    executeSql: function() {
+      console.log('views.database.executeSql()');
+    }
+  }
+});
+</script>

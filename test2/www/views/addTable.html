@@ -1,0 +1,110 @@
+<!-- ADD TABLE VIEW -->
+<form id="addTable">
+  <style>
+    form#addTable header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
+  </style>
+  <header>
+    <h2>Add Table</h2>
+  </header>
+  <ul class="list-group">
+    <li class="list-group-item row">
+      <label class="col-sm-3">Name</label>
+      <div class="col-sm-9">
+        <input type="text" id="addTable__name" class="form-control" name="name" placeholder="Table Name" value="{{name}}"/>
+      </div>
+    </li>
+  </ul>
+  <ul id="addTable__columns" class="list-group">
+    {{#each columns}}
+    <li class="list-group-item"><i class="glyphicon glyphicon-chevron-right"></i><a class="glyphicon glyphicon glyphicon-remove-circle pull-right"></a> <b>{{name}}</b> ({{dataType}} {{nullable}} {{primaryKey}})</li>
+    {{else}}
+    <li class="list-group-item">No columns</li>
+    {{/each}}
+  </ul>
+  <h2>New Column</h2>
+  <ul class="list-group">
+    <li class="list-group-item row">
+      <label class="col-sm-3">Name</label>
+      <div class="col-sm-9">
+        <input id="addTable__columnName" class="form-control" type="text" name="columnName" placeholder="Column Name"/>
+      </div>
+    </li>
+    <li class="list-group-item row">
+      <label class="col-sm-3">Data Type</label>
+      <div class="col-sm-9">
+        <select id="addTable__dataType" class="form-control" name="dataType">
+        <option>TEXT</option><option>INTEGER</option><option>TIMESTAMP</option><option>FLOAT</option><option>BOOLEAN</option>
+      </select>
+      </div>
+    </li>
+    <li class="list-group-item row">
+      <label class="col-sm-3">Null</label>
+      <div class="col-sm-9 radio">
+        <label for="addTable__nullable-1"><input id="addTable__nullable-1" type="radio" name="nullable" value="Yes" checked="true"/>Yes</label>
+        <label for="addTable__nullable-2"><input id="addTable__nullable-2" type="radio" name="nullable" value="No"/>No</label>
+      </div>
+    </li>
+    <li class="list-group-item row">
+      <label class="col-sm-3">Primary Key</label>
+      <div class="col-sm-9 radio">
+        <label for="addTable__primarKey-1"><input id="addTable__primarKey-1" type="radio" name="primaryKey" value="Yes"/>Yes</label>
+        <label for="addTable__primarKey-2"><input id="addTable__primarKey-2" type="radio" name="primaryKey" value="No" checked="true"/>No</label>
+      </div>
+    </li>
+  </ul>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="addColumn">Add Column</a>
+  </div>
+  <h2>Options</h2>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="ok">Ok</a>
+    <a class="btn btn-default" href="javascript:;" data-action="cancel">Cancel</a>
+  </div>
+</form>
+
+<script>
+window.app = window.app || {};
+window.app.views = window.app.views || {};
+window.app.views.addTable = window.views.Base.extend({
+  el: $('#addTable'),
+  initialize: function () {
+    console.log('views.addTable.initialize()');
+    this.model = new models.Table();
+    this.template = Handlebars.compile(this.el.innerHTML);
+    this.render();
+    this.model.on('change', this.render.bind(this));
+  },
+  events: {
+    "click [data-action]": "route",
+    "change input": "change",
+    "change select": "change"
+  },
+  actions: {
+    addColumn: function() {
+      console.log('views.addTable.actions.addColumn()');
+      var column = {
+        name: this.val('columnName'),
+        dataType: this.val('dataType'),
+        nullable: this.val('nullable') === 'Yes' ? 'NULL' : 'NOT NULL',
+        primaryKey: this.val('primaryKey') === 'No' ? '' : 'PRIMARY KEY'
+      };
+      if (!column.name) {
+        alert("Please make sure there are no spaces in the column name");
+      } else {
+        this.model.get('columns').push(column);
+        this.model.trigger('change');
+      }
+    },
+    ok: function() {
+      console.log('views.addTable.actions.ok()');
+      this.model.create((function() {
+        this.trigger('close');
+      }).bind(this));
+    },
+    cancel: function() {
+      console.log('views.addTable.actions.cancel()');
+      this.trigger('close');
+    }
+  }
+});
+</script>

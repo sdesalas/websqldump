@@ -1,0 +1,61 @@
+body {
+	font-family: "Segoe UI", "Trebuchet MS", Tahoma, Arial, Helvetica, sans-serif;
+	margin: 0px;
+	padding: 0px;
+	background: #f0f0f0;
+}
+
+nav.navbar {
+	padding: 0;
+	background-color: #006890;
+}
+
+nav.navbar h1 {
+	width: 100%;
+	color: #eee;
+	text-align: center;
+	font-size: 130%;
+	margin: 14px 0;
+	text-shadow: #111 1px -1px 0px;
+}
+
+form {
+	width: 600px;
+	margin: 0px auto;
+	padding: 70px 0 30px;
+	display: none;
+}
+
+form h2 {
+	font-size: 115%;
+	font-weight: bold;
+}
+
+input.form-control, select.form-control {
+	background-color: #fffbdb;
+}
+
+.btn-default:hover {
+	background-color: #e2e8ea;
+}
+
+.list-group-item {
+	border: 1px solid #ccc;
+}
+
+.list-group-item label {
+	padding-top: 7px;
+}
+
+.list-group-item .radio {
+	margin: 0;
+}
+
+.list-group-item .radio label {
+	min-width: 80px;
+}
+
+.list-group-item.row {
+	margin-left: 0;
+	margin-right: 0;
+}

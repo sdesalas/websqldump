@@ -1,0 +1,71 @@
+
+<!-- VIEW TABLE VIEW -->
+<form id="viewTable">
+  <style>
+    form#viewTable header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
+    form#viewTable ul.add-row label {display: block; width: 100px; }
+  </style>
+  <header>
+    <h2>{{name}}</h2>
+  </header>
+  <ul class="list-group">
+    {{#each rows}}
+    <li class="list-group-item"><a href="javascript:;" class="delete"></a>
+      <dl>
+      {{#each .}}
+        <dt>{{@key}}</dt><dd>{{this}}</dd>
+      {{/each}}
+      </dl>
+    </li>
+    {{else}}
+    <li class="list-group-item">No columns</li>
+    {{/each}}
+  </ul>
+  <ul class="list-group add-row">
+    {{#each cols}}
+    <li class="list-group-item"><a href="javascript:;" class="add"></a>
+      <input type="text" name="col-{{name}}" value="" class="form-control" placeholder="{{name}}">
+    </li>
+    {{/each}}
+  </ul>
+  <h2>Options</h2>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="truncate">Truncate</a>
+    <a class="btn btn-default" href="javascript:;" data-action="export">Export</a>
+  </div>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="dropTable">Drop Table</a>
+    <a class="btn btn-default" href="javascript:;" data-action="cancel">Cancel</a>
+  </div>
+</form>
+
+<script>
+window.app = window.app || {};
+window.app.views = window.app.views || {};
+window.app.views.viewTable = window.views.Base.extend({
+  el: $('#viewTable'),
+  initialize: function (name) {
+    console.log('views.viewTable.initialize()');
+    this.template = Handlebars.compile(this.el.innerHTML);
+    this.model = new models.Table({
+      name: name,
+      ready: (function() {
+        this.render();
+      }).bind(this)
+    });
+    this.model.on('change', this.render.bind(this));
+    this.render();
+  },
+  events: {
+    "click [data-action]": "route",
+    "change input": "change",
+    "change select": "change"
+  },
+  actions: {
+    cancel: function() {
+      console.log('views.viewTable.actions.cancel()');
+      this.trigger('close');
+    } 
+  }
+});
+</script>

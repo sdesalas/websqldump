@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>WebSqlDump Test Harness</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="lib/bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="style.css" />
+    <script src="lib/jquery-1.11.2.min.js"></script>
+    <script src="lib/handlebars.min.js"></script>
+    <script src="lib/underscore-min.js"></script>
+    <script src="lib/backbone-min.js"></script>
+  </head>
+  <body>
+
+    <nav class="navbar navbar-default navbar-fixed-top navbar-inverse" role="navigation">
+      <h1>WebSqlDump</h1>
+    </nav>
+
+    <section data-view="addTable"></section>
+    <section data-view="viewTable"></section>
+    <section data-view="database"></section>
+
+    <script src="views/Base.js"></script>
+    <script src="models/Database.js"></script>
+    <script src="models/Table.js"></script>
+
+    <script>
+    var app = window.app = {
+      views: {},
+      viewReady: function(name, el) {
+        console.log('app.viewReady()');
+        var view = this.views[name];
+        if (view) {
+          view.ready = true;
+          var remaining = Object.keys(this.views).map(function(name) {
+            return app.views[name];
+          }).filter(function(view) { return view.ready === false; });
+          if (remaining.length === 0) {
+            this.domReady();
+          }
+        }
+      },
+      loadView: function(el) {
+        console.log('app.loadView()');
+        var name = $(el).data().view;
+        if (name) {
+          this.views[name] = { ready : false };
+          $(el).load('views/' + name + '.html', (this.viewReady).bind(this, name, el));
+        }
+      },
+      init: function() {
+        console.log('app.init()');
+        $('[data-view]').toArray().forEach((window.app.loadView).bind(this));
+      },
+      domReady: function () {
+        console.log('app.domReady()');
+        this.model = new models.Database();
+        this.databaseView = new app.views.database(this.model);
+        Backbone.history.start();
+      },
+      router: new (Backbone.Router.extend({
+        routes: {
+          '': 'database',
+          "table/new": "addTable",
+          "table/:name": "viewTable"
+        },
+        database: function() {
+          console.log('app.router.database()');
+          app.databaseView.refresh();
+        },
+        addTable: function() {
+          console.log('app.router.addTable()');
+          var addTable = new app.views.addTable();
+          addTable.on('close', this.navigate.bind(this, '', {trigger: true}));
+        },
+        viewTable: function(name) {
+          console.log('app.router.viewTable(' + name + ')');
+          var viewTable = new app.views.viewTable(name);
+          viewTable.on('close', this.navigate.bind(this, '', {trigger: true}));
+        }
+      }))
+    };
+    app.init();
+    </script>
+  </body>
+</html>

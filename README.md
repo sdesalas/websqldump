@@ -63,5 +63,3 @@ The following page contains a test harness:
 [http://sdesalas.github.io/websqldump](http://sdesalas.github.io/websqldump)
 
 You will need to create some tables and enter data in order for the demo to become meaningful.
-
-![Test Harness](https://raw.githubusercontent.com/sdesalas/websqldump/master/img/screenshot.testharness.png)

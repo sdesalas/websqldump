@@ -2,6 +2,7 @@
 <form id="addTable">
   <style>
     form#addTable header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
+    form#addTable a[data-action=deleteColumn] { position: absolute; right: 10px; top: 12px; color: #c00; text-decoration: none; cursor: pointer;}
   </style>
   <header>
     <h2>Add Table</h2>
@@ -16,7 +17,7 @@
   </ul>
   <ul id="addTable__columns" class="list-group">
     {{#each columns}}
-    <li class="list-group-item"><i class="glyphicon glyphicon-chevron-right"></i><a class="glyphicon glyphicon glyphicon-remove-circle pull-right"></a> <b>{{name}}</b> ({{dataType}} {{nullable}} {{primaryKey}})</li>
+    <li class="list-group-item"><a class="glyphicon glyphicon-remove-circle pull-right" data-action="deleteColumn" data-index="{{@index}}"></a> <b>{{name}}</b> ({{dataType}} {{nullable}} {{primaryKey}})</li>
     {{else}}
     <li class="list-group-item">No columns</li>
     {{/each}}
@@ -69,7 +70,7 @@ window.app.views.addTable = window.views.Base.extend({
   el: $('#addTable'),
   initialize: function () {
     console.log('views.addTable.initialize()');
-    this.model = new models.Table();
+    this.model = new models.Table({db: app.db});
     this.template = Handlebars.compile(this.el.innerHTML);
     this.render();
     this.model.on('change', this.render.bind(this));
@@ -92,6 +93,14 @@ window.app.views.addTable = window.views.Base.extend({
         alert("Please make sure there are no spaces in the column name");
       } else {
         this.model.get('columns').push(column);
+        this.model.trigger('change');
+      }
+    },
+    deleteColumn: function(el) {
+      console.log('views.addTable.actions.deleteColumn()');
+      var index = Number($(el).data().index);
+      if (!isNaN(index)) {
+        this.model.get('columns').splice(index, 1);
         this.model.trigger('change');
       }
     },

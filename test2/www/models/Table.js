@@ -2,8 +2,7 @@ window.models = window.models || {};
 window.models.Table = Backbone.Model.extend({
   initialize: function (config) {
     console.log('new models.Table()');
-    if (config && config.name && config.db) {
-      this.name = config.name;
+    if (config && config.db) {
       this.db = config.db;
       this.db.execute({
         sql: 'SELECT sql FROM sqlite_master WHERE tbl_name = \'' + this.name + '\';',
@@ -21,6 +20,7 @@ window.models.Table = Backbone.Model.extend({
               };
               cols.push(col);
             });
+            this.set('name', config.name || '');
             this.set('sql', sql);
             this.set('cols', cols);
           }
@@ -30,13 +30,16 @@ window.models.Table = Backbone.Model.extend({
     }
   },
   refresh: function (callback) {
+    var name = this.get('name');
+    if (name) {
       this.db.execute({
-        sql: 'SELECT rowid as _rowid, * FROM ' + this.name + ';',
+        sql: 'SELECT rowid as _rowid, * FROM ' + name + ';',
         success: (function (transaction, results) {
           this.set('rows', results.rows);
           if (callback) callback();
         }).bind(this)
       });
+    }
   },
   insert: function (row, callback) {
     console.log('models.Table.insert()');

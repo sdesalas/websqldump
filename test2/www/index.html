@@ -31,8 +31,8 @@
     </nav>
 
     <section data-view="addTable"></section>
-    <section data-view="viewTable"></section>
-    <section data-view="database"></section>
+    <section data-view="table"></section>
+    <section data-view="main"></section>
 
     <script src="views/Base.js"></script>
     <script src="models/Database.js"></script>
@@ -68,29 +68,29 @@
       },
       domReady: function () {
         console.log('app.domReady()');
-        this.model = new models.Database();
-        this.databaseView = new app.views.database(this.model);
+        this.db = new models.Database();
+        this.mainView = new app.views.main(this.db);
         Backbone.history.start();
       },
       router: new (Backbone.Router.extend({
         routes: {
-          '': 'database',
+          '': 'main',
           "table/new": "addTable",
-          "table/:name": "viewTable"
+          "table/:name": "table"
         },
-        database: function() {
-          console.log('app.router.database()');
-          app.databaseView.refresh();
+        main: function() {
+          console.log('app.router.main()');
+          app.mainView.refresh();
         },
         addTable: function() {
           console.log('app.router.addTable()');
           var addTable = new app.views.addTable();
           addTable.on('close', this.navigate.bind(this, '', {trigger: true}));
         },
-        viewTable: function(name) {
-          console.log('app.router.viewTable(' + name + ')');
-          var viewTable = new app.views.viewTable(name);
-          viewTable.on('close', this.navigate.bind(this, '', {trigger: true}));
+        table: function(name) {
+          console.log('app.router.table(' + name + ')');
+          var table = new app.views.table(name);
+          table.on('close', this.navigate.bind(this, '', {trigger: true}));
         }
       }))
     };

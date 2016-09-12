@@ -1,15 +1,15 @@
 
 <!-- VIEW TABLE VIEW -->
-<form id="viewTable">
+<form id="table">
   <style>
-    form#viewTable header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
-    form#viewTable ul.rows li { position: relative; }
-    form#viewTable ul.rows li a.delete { display: block; width: 20px; height: 20px; position: absolute; right: 5px; top: 10px; background: transparent url('img/delete.gif') no-repeat left top; }
-    form#viewTable ul.add-row label {display: inline-block; width: 30%; }
-    form#viewTable ul.add-row input {display: inline-block; width: 68%; }
-    form#viewTable dl {margin: 0;}
-    form#viewTable dl dt {display: inline-block; width: 30%;}
-    form#viewTable dl dd {display: inline-block; width: 68%;}
+    form#table header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
+    form#table ul.rows li { position: relative; }
+    form#table ul.rows li a.delete { display: block; width: 20px; height: 20px; position: absolute; right: 5px; top: 10px; background: transparent url('img/delete.gif') no-repeat left top; }
+    form#table ul.add-row label {display: inline-block; width: 30%; }
+    form#table ul.add-row input {display: inline-block; width: 68%; }
+    form#table dl {margin: 0;}
+    form#table dl dt {display: inline-block; width: 30%;}
+    form#table dl dd {display: inline-block; width: 68%;}
   </style>
   <header>
     <h2>{{name}}</h2>
@@ -54,14 +54,14 @@
 <script>
 window.app = window.app || {};
 window.app.views = window.app.views || {};
-window.app.views.viewTable = window.views.Base.extend({
-  el: $('#viewTable'),
+window.app.views.table = window.views.Base.extend({
+  el: $('#table'),
   initialize: function (name) {
-    console.log('views.viewTable.initialize()');
+    console.log('views.table.initialize()');
     this.template = Handlebars.compile(this.el.innerHTML);
     this.model = new models.Table({
       name: name,
-      db: app.model,
+      db: app.db,
       ready: (function() {
         this.render();
       }).bind(this)
@@ -79,23 +79,23 @@ window.app.views.viewTable = window.views.Base.extend({
   },
   actions: {
     addRow: function() {
-      console.log('views.viewTable.actions.addRow()');
+      console.log('views.table.actions.addRow()');
       var row = {};
-      $('form#viewTable ul.add-row input').each(function(i, e) {
+      $('form#table ul.add-row input').each(function(i, e) {
           var key = $(e).attr('placeholder');
           row[key] = e.value;
       });
       this.model.insert(row, this.refresh.bind(this));
     },
     deleteRow: function(el) {
-      console.log('views.viewTable.actions.deleteRow()');
+      console.log('views.table.actions.deleteRow()');
       var rowid = $(el).data().rowid;
       if (rowid) {
         this.model.delete(rowid, this.refresh.bind(this));
       }
     },
     cancel: function() {
-      console.log('views.viewTable.actions.cancel()');
+      console.log('views.table.actions.cancel()');
       this.trigger('close');
     }
   }

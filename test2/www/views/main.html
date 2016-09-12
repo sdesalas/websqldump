@@ -1,11 +1,11 @@
-<!-- DATABASE VIEW -->
-<form id="database">
+<!-- MAIN VIEW -->
+<form id="main">
   <style>
-    form#database header { background: transparent url(img/database.png) no-repeat left top; padding-left: 60px; }
-    form#database input[name=name] { padding: 1px 2px; font-weight: bold;}
-    form#database li.list-group-item[data-action] { cursor: pointer;}
-    form#database li.list-group-item[data-action]:hover { background-color: #dee7ef;}
-    form#database .sql-editor { height: 200px; margin-bottom: 20px; font-weight: bold; font-family: "Courier New", courier, monospace; }
+    form#main header { background: transparent url(img/database.png) no-repeat left top; padding-left: 60px; }
+    form#main input[name=name] { padding: 1px 2px; font-weight: bold;}
+    form#main li.list-group-item[data-action] { cursor: pointer;}
+    form#main li.list-group-item[data-action]:hover { background-color: #dee7ef;}
+    form#main .sql-editor { height: 200px; margin-bottom: 20px; font-weight: bold; font-family: "Courier New", courier, monospace; }
   </style>
   <header>
     <input type="text" name="name" value="{{name}}"><br/>
@@ -39,10 +39,10 @@
 <script>
 window.app = window.app || {};
 window.app.views = window.app.views || {};
-window.app.views.database = window.views.Base.extend({
-  el: $('#database'),
+window.app.views.main = window.views.Base.extend({
+  el: $('#main'),
   initialize: function (model) {
-    console.log('views.database.initialize()');
+    console.log('views.main.initialize()');
     this.model = model;
     this.template = Handlebars.compile(this.el.innerHTML);
     this.render();
@@ -57,21 +57,21 @@ window.app.views.database = window.views.Base.extend({
   },
   actions: {
     addTable: function() {
-      console.log('views.database.addTable()');
+      console.log('views.main.addTable()');
       app.router.navigate('table/new', {trigger: true});
     },
     viewTable: function(target) {
-      console.log('views.database.viewTable()');
+      console.log('views.main.viewTable()');
       var name = target.innerText;
       if (name) {
         app.router.navigate('table/' + name, {trigger: true});
       }
     },
     generateDump: function() {
-      console.log('views.database.generateDump()');
+      console.log('views.main.generateDump()');
     },
     executeSql: function() {
-      console.log('views.database.executeSql()');
+      console.log('views.main.executeSql()');
     }
   }
 });

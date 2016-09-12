@@ -6,8 +6,8 @@ window.views.Base = Backbone.View.extend({
     $('form').hide();
     this.$el.show();
   },
-  route: function(event) {
-    console.log('views.Base.route()');
+  do: function(event) {
+    console.log('views.Base.do()');
     var name = $(event.target).data().action,
       action = this.actions[name];
     if (action) {

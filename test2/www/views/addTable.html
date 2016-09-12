@@ -75,7 +75,7 @@ window.app.views.addTable = window.views.Base.extend({
     this.model.on('change', this.render.bind(this));
   },
   events: {
-    "click [data-action]": "route",
+    "click [data-action]": "do",
     "change input": "change",
     "change select": "change"
   },

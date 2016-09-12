@@ -13,6 +13,16 @@
     <script src="lib/handlebars.min.js"></script>
     <script src="lib/underscore-min.js"></script>
     <script src="lib/backbone-min.js"></script>
+    <script type="text/javascript">
+    Handlebars.registerHelper({
+      eq: function (v1, v2) {
+          return v1 === v2;
+      },
+      ne: function (v1, v2) {
+        return v1 !== v2;
+      }
+    });
+    </script>
   </head>
   <body>
 

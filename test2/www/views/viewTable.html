@@ -3,17 +3,25 @@
 <form id="viewTable">
   <style>
     form#viewTable header { font-weight: bold; height: 60px; padding-left: 60px; background: transparent url('img/table.png') no-repeat left top; }
-    form#viewTable ul.add-row label {display: block; width: 100px; }
+    form#viewTable ul.rows li { position: relative; }
+    form#viewTable ul.rows li a.delete { display: block; width: 20px; height: 20px; position: absolute; right: 5px; top: 10px; background: transparent url('img/delete.gif') no-repeat left top; }
+    form#viewTable ul.add-row label {display: inline-block; width: 30%; }
+    form#viewTable ul.add-row input {display: inline-block; width: 68%; }
+    form#viewTable dl {margin: 0;}
+    form#viewTable dl dt {display: inline-block; width: 30%;}
+    form#viewTable dl dd {display: inline-block; width: 68%;}
   </style>
   <header>
     <h2>{{name}}</h2>
   </header>
-  <ul class="list-group">
+  <ul class="list-group rows">
     {{#each rows}}
-    <li class="list-group-item"><a href="javascript:;" class="delete"></a>
+    <li class="list-group-item"><a href="javascript:;" class="delete" data-action="deleteRow" data-rowid="{{_rowid}}"></a>
       <dl>
       {{#each .}}
-        <dt>{{@key}}</dt><dd>{{this}}</dd>
+      {{#if (ne @key "_rowid")}}
+        <dt>{{@key}}:</dt><dd>{{this}}</dd>
+      {{/if}}
       {{/each}}
       </dl>
     </li>
@@ -21,13 +29,17 @@
     <li class="list-group-item">No columns</li>
     {{/each}}
   </ul>
+  <h2>Add New Row</h2>
   <ul class="list-group add-row">
     {{#each cols}}
     <li class="list-group-item"><a href="javascript:;" class="add"></a>
-      <input type="text" name="col-{{name}}" value="" class="form-control" placeholder="{{name}}">
+      <label for="add-col-{{name}}">{{name}}</label><input type="text" id="add-col-{{name}}" name="col-{{name}}" value="" class="form-control" placeholder="{{name}}">
     </li>
     {{/each}}
   </ul>
+  <div class="btn-group btn-group-justified">
+    <a class="btn btn-default" href="javascript:;" data-action="addRow">Add Row</a>
+  </div>
   <h2>Options</h2>
   <div class="btn-group btn-group-justified">
     <a class="btn btn-default" href="javascript:;" data-action="truncate">Truncate</a>
@@ -49,6 +61,7 @@ window.app.views.viewTable = window.views.Base.extend({
     this.template = Handlebars.compile(this.el.innerHTML);
     this.model = new models.Table({
       name: name,
+      db: app.model,
       ready: (function() {
         this.render();
       }).bind(this)
@@ -56,16 +69,35 @@ window.app.views.viewTable = window.views.Base.extend({
     this.model.on('change', this.render.bind(this));
     this.render();
   },
+  refresh: function() {
+      this.model.refresh(this.render.bind(this));
+  },
   events: {
-    "click [data-action]": "route",
+    "click [data-action]": "do",
     "change input": "change",
     "change select": "change"
   },
   actions: {
+    addRow: function() {
+      console.log('views.viewTable.actions.addRow()');
+      var row = {};
+      $('form#viewTable ul.add-row input').each(function(i, e) {
+          var key = $(e).attr('placeholder');
+          row[key] = e.value;
+      });
+      this.model.insert(row, this.refresh.bind(this));
+    },
+    deleteRow: function(el) {
+      console.log('views.viewTable.actions.deleteRow()');
+      var rowid = $(el).data().rowid;
+      if (rowid) {
+        this.model.delete(rowid, this.refresh.bind(this));
+      }
+    },
     cancel: function() {
       console.log('views.viewTable.actions.cancel()');
       this.trigger('close');
-    } 
+    }
   }
 });
 </script>

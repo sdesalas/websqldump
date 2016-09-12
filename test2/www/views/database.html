@@ -48,14 +48,12 @@ window.app.views.database = window.views.Base.extend({
     this.render();
   },
   events: {
-    "click [data-action]": "route",
+    "click [data-action]": "do",
     "change input": "change",
     "change select": "change"
   },
   refresh: function() {
-    this.model.loadSchema((function() {
-      this.render();
-    }).bind(this));
+    this.model.refresh(this.render.bind(this));
   },
   actions: {
     addTable: function() {

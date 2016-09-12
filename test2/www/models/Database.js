@@ -2,7 +2,6 @@ window.models = window.models || {};
 window.models.Database = Backbone.Model.extend({
   initialize: function (config) {
     console.log('new Database()');
-	//this.loadSchema(config ? config.ready : null);
   },
   defaults: {
       name: 'WebSQLDump',
@@ -10,7 +9,7 @@ window.models.Database = Backbone.Model.extend({
       info: '',
       size: 512000
   },
-  loadSchema: function(callback) {
+  refresh: function(callback) {
 	this.execute({
 		sql: 'SELECT name FROM sqlite_master WHERE type="table" AND name NOT LIKE "__webkit%" ORDER BY name;',
 		success: (function(transaction, results) {

@@ -68,6 +68,7 @@
       },
       domReady: function () {
         console.log('app.domReady()');
+        $('form').submit(function() { return false; });
         this.db = new models.Database();
         this.mainView = new app.views.main(this.db);
         Backbone.history.start();
@@ -75,11 +76,15 @@
       router: new (Backbone.Router.extend({
         routes: {
           '': 'main',
+          'database/:name': "main",
           "table/new": "addTable",
           "table/:name": "table"
         },
-        main: function() {
-          console.log('app.router.main()');
+        main: function(databaseName) {
+          console.log('app.router.main(' + databaseName + ')');
+          if (databaseName) {
+            app.db.set('name', databaseName);
+          }
           app.mainView.refresh();
         },
         addTable: function() {

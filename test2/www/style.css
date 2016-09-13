@@ -26,9 +26,14 @@ form {
 	display: none;
 }
 
+form header h2 {
+	font-size: 180%;
+	padding: 8px 0;
+	margin-top: 0;
+}
+
 form h2 {
-	font-size: 115%;
-	font-weight: bold;
+	font-size: 120%;
 }
 
 input.form-control, select.form-control {
@@ -58,4 +63,9 @@ input.form-control, select.form-control {
 .list-group-item.row {
 	margin-left: 0;
 	margin-right: 0;
+}
+
+/* PHABLET & MOBILE SUPPORT - rules apply below 700px width */
+@media all and (max-width: 700px) {
+    form { min-width: 310px; width: auto; padding-left: 10px; padding-right: 10px;}
 }

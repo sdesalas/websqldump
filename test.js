@@ -9,6 +9,6 @@ require('http').createServer(function (request, response) {
     }).resume();
 }).listen(port, function() {
   console.log('Node app is running on port', port);
-  open('http://localhost:5000/spec/run.html');
+  open('http://localhost:5000/specs/run.html');
 });
 

@@ -1,0 +1,148 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <title>WebSqlDump Spec</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta content="text/html; charset=utf-8" http-equiv="Content-Type">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no"/>
+    <link rel="stylesheet" type="text/css" href="lib/mocha.css" />
+    <style> sql {display: none;}</style>
+  </head>
+  <body>
+
+  <div id="mocha"></div>
+  <script src="../websqldump.js"></script>
+  <script src="sql.js"></script>
+  <script src="lib/mocha.js"></script>
+  <script src="lib/chai.js"></script>
+  <script>
+    mocha.setup('tdd');
+    window.assert = chai.assert;
+  </script>
+  <script>;
+
+    function lines(str) {
+      return str && str.split(';')
+        .map(function(line) { return line.trim(); })
+        .filter(function(line) { return line; });
+    }
+
+    suite('window.openDatabase', function() {
+      var db;
+      test('should exist', function() {
+        assert(window.openDatabase, 'is defined')
+      });
+      test('should create a database with transaction support', function() {
+        db = SQL.init('WebSqlDumpSpec');
+        assert(db, 'db is defined');
+        assert(db.transaction, 'db.transaction is defined');
+      });
+      test('should clear database content', function(done) {
+        var sql = document.getElementById('sql.clear').innerText;
+        SQL.executeMulti({
+          sql: sql, 
+          success: function() {
+            assert(true, 'All Done');
+            done();
+          }
+        });
+      });
+      test('should initialise database with content', function(done) {
+        var sql = document.getElementById('sql.init').innerText;
+        SQL.executeMulti({
+          sql: sql, 
+          success: function() {
+            assert(true, 'All Done');
+            done();
+          }
+        });
+      });
+    });
+
+    suite('websqldump', function() {
+      var db;
+      setup(function() {
+        db = SQL.init();
+      });
+
+      test('should exist', function() {
+        assert(window.websqldump, 'websqldump is defined');
+      });
+
+      suite('#export()', function() {
+        var originalConsoleLog = window.console && window.console.log;
+        var originalLines;
+
+        suiteSetup(function() {
+          originalLines = lines(document.getElementById('sql.init').innerText)
+        });
+
+        suiteTeardown(function() {
+          window.console.log = originalConsoleLog;
+        });
+
+        test('should exist', function() {
+          assert(websqldump.export, 'websqldump.export is defined');
+          assert(typeof websqldump.export === 'function', 'websqldump.export is a function');
+        });
+
+        test('when executed with only table argument, should log contents to the console', function(done) {
+          window.console.log = function(data) {
+            var exportLines = lines(data);
+            assert.equal(exportLines.length, originalLines.length);
+            exportLines.forEach(function(exportedLine, index) {
+              var originalLine = originalLines[index].replace(/\s|`/g, '');
+              exportedLine = exportedLine.replace(/\s|`/g, '');
+              assert.equal(originalLine, exportedLine);
+            });
+            done();
+          };
+          // Should log to console
+          websqldump.export({
+            database: 'WebSqlDumpSpec'
+          });
+        });
+
+        test('when executed with a success argument, should call success with database contents', function(done) {
+          // Should log to console
+          websqldump.export({
+            database: 'WebSqlDumpSpec',
+            success: function(data) {
+              var exportLines = lines(data);
+              assert.equal(exportLines.length, originalLines.length);
+              exportLines.forEach(function(exportedLine, index) {
+                var originalLine = originalLines[index].replace(/\s|`/g, '');
+                exportedLine = exportedLine.replace(/\s|`/g, '');
+                assert.equal(originalLine, exportedLine);
+              });
+              done();
+            }
+          });
+        });
+      });
+    });
+
+  </script>
+  <script>
+    mocha.checkLeaks();
+    mocha.globals(['websqldump']);
+    mocha.run();
+  </script>
+
+  <sql id="sql.clear">
+DROP TABLE IF EXISTS `Orders`;
+DROP TABLE IF EXISTS `Customers`; 
+  </sql>
+  <sql id="sql.init">
+CREATE TABLE `Orders` (ID INTEGER NOT NULL PRIMARY KEY, ProductName TEXT NULL , Quantity INTEGER NULL , Date TIMESTAMP NULL , Price FLOAT NULL );
+INSERT INTO `Orders` (ID, ProductName, Quantity, Date, Price) VALUES ("1","Paperclips","200","2016-10-15","45.99");
+INSERT INTO `Orders` (ID, ProductName, Quantity, Date, Price) VALUES ("2","Sticky Tape","10","2016-10-15","15.99");
+CREATE TABLE `Customers` (ID INTEGER NOT NULL PRIMARY KEY, FirstName TEXT NULL , LastName TEXT NULL , DOB TIMESTAMP NULL , VIP BOOLEAN NULL );
+INSERT INTO `Customers` (ID,FirstName,LastName,DOB,VIP) VALUES ("1","John","Smith","1997-10-22","1");
+INSERT INTO `Customers` (ID,FirstName,LastName,DOB,VIP) VALUES ("2","Mary","Pickings","1982-04-16","0");
+  </sql>
+
+  </body>
+</html>

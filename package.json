@@ -1,0 +1,31 @@
+{
+  "name": "websqldump",
+  "version": "1.0.0",
+  "description": "An ultra-light JS library for exporting data out of WebSQL",
+  "main": "websqldump.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "node test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/sdesalas/websqldump.git"
+  },
+  "keywords": [
+    "backup",
+    "WebSQL",
+    "dump"
+  ],
+  "author": "Steven de Salas",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/sdesalas/websqldump/issues"
+  },
+  "homepage": "https://github.com/sdesalas/websqldump#readme",
+  "devDependencies": {
+    "node-static": "^0.7.9",
+    "open": "0.0.5"
+  }
+}

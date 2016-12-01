@@ -71,11 +71,11 @@
         assert(window.websqldump, 'websqldump is defined');
       });
 
-      suite('#export()', function() {
+      suite('.export()', function() {
         var originalConsoleLog = window.console && window.console.log;
         var originalLines;
 
-        suiteSetup(function() {
+        setup(function() {
           originalLines = lines(document.getElementById('sql.init').innerText)
         });
 
@@ -88,7 +88,7 @@
           assert(typeof websqldump.export === 'function', 'websqldump.export is a function');
         });
 
-        test('when executed with only table argument, should log contents to the console', function(done) {
+        test('.export({ database: database })', function(done) {
           window.console.log = function(data) {
             var exportLines = lines(data);
             assert.equal(exportLines.length, originalLines.length);
@@ -105,8 +105,7 @@
           });
         });
 
-        test('when executed with a success argument, should call success with database contents', function(done) {
-          // Should log to console
+        test('.export({ database: database, success: success })', function(done) {
           websqldump.export({
             database: 'WebSqlDumpSpec',
             success: function(data) {
@@ -121,6 +120,43 @@
             }
           });
         });
+
+        test('.export({ database: database, schemaonly: true, success: success })', function(done) {
+          websqldump.export({
+            database: 'WebSqlDumpSpec',
+            schemaonly: true,
+            success: function(data) {
+              var exportLines = lines(data);
+              originalLines = originalLines.filter(function(line) { return line.indexOf('CREATE TABLE') === 0; });
+              assert.equal(exportLines.length, originalLines.length);
+              exportLines.forEach(function(exportedLine, index) {
+                var originalLine = originalLines[index].replace(/\s|`/g, '');
+                exportedLine = exportedLine.replace(/\s|`/g, '');
+                assert.equal(originalLine, exportedLine);
+              });
+              done();
+            }
+          });
+        });
+
+        test('.export({ database: database, dataonly: true, success: success })', function(done) {
+          websqldump.export({
+            database: 'WebSqlDumpSpec',
+            dataonly: true,
+            success: function(data) {
+              var exportLines = lines(data);
+              originalLines = originalLines.filter(function(line) { return line.indexOf('CREATE TABLE') !== 0; });
+              assert.equal(exportLines.length, originalLines.length);
+              exportLines.forEach(function(exportedLine, index) {
+                var originalLine = originalLines[index].replace(/\s|`/g, '');
+                exportedLine = exportedLine.replace(/\s|`/g, '');
+                assert.equal(originalLine, exportedLine);
+              });
+              done();
+            }
+          });
+        });
+
       });
     });
 

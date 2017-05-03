@@ -35,7 +35,7 @@ wd.exportTable = function(config) {
 	if (!config.dataonly) {
 		wd.execute({
 			db: config.db,
-			sql: "SELECT sql FROM sqlite_master WHERE tbl_name=?;", 
+			sql: "SELECT sql FROM sqlite_master WHERE type='table' AND tbl_name=?;", 
 			params: [table], 
 			success: function(results) {
 				if (!results.rows || !results.rows.length) {
@@ -100,7 +100,7 @@ wd.export = function(config) {
 		// Export all tables in db
 		wd.execute({
 			db: config.db,
-			sql: "SELECT tbl_name FROM sqlite_master;", 
+			sql: "SELECT tbl_name FROM sqlite_master WHERE type='table';", 
 			success: function(results) {
 				if (results.rows) {
 					// First count the outstanding tables

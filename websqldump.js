@@ -12,13 +12,16 @@
   // Default config
   wd.config = {
     database: undefined,
-    table: undefined, // undefined to export all tables
-    version: "1.0",
+    view: undefined, // Treated similarly to table. Added for sake of parity.
+    views: [], // true to export all views
+    table: undefined, // If not undefined, will be appended to tables array (left for backwards-compatibility)
+    tables: [], // undefined to export all tables
+    casesensitive: true,
+    version: "1",
     info: "",
     dbsize: 5 * 1024 * 1024, // 5MB
-    linebreaks: false,
     schemaonly: false,
-    dataonly: false,
+    dataonly: false, // If true, views will NOT be exported
     success: function(sql) {
       console.log(sql);
     },
@@ -27,15 +30,14 @@
     }
   };
 
-  wd.exportTable = function(config) {
+  wd.exportViewOrTable = function(config, name, type) {
     // Use closure to avoid overwrites
-    var table = config.table;
-    // Export schema
-    if (!config.dataonly) {
+    // Export schema/table schema
+    if (!config.dataonly || type !== "table") {
       wd.execute({
         db: config.db,
-        sql: "SELECT sql FROM sqlite_master WHERE type='table' AND tbl_name=?;",
-        params: [table],
+        sql: `SELECT sql FROM sqlite_master WHERE type='${type}' AND tbl_name=?;`,
+        params: [name],
         success: function(results) {
           if (!results.rows || !results.rows.length) {
             if (typeof config.error === "function")
@@ -43,19 +45,21 @@
             return;
           }
           config.exportSql.push(results.rows.item(0)["sql"]);
-          if (config.schemaonly) {
-            if (typeof config.success === "function")
-              config.success(config.exportSql.toString());
+          if (config.schemaonly || type === "view") {
+            if (typeof config.success === "function") {
+              config.success(config.exportSql);
+            }
             return;
           }
         }
       });
     }
+
     // Export data
-    if (!config.schemaonly) {
+    if (!config.schemaonly && type === "table") {
       wd.execute({
         db: config.db,
-        sql: "SELECT * FROM '" + table + "';",
+        sql: "SELECT * FROM '" + name + "';",
         success: function(results) {
           if (results.rows && results.rows.length) {
             for (var i = 0; i < results.rows.length; i++) {
@@ -92,57 +96,97 @@
     for (var prop in wd.config) {
       if (typeof config[prop] === "undefined") config[prop] = wd.config[prop];
     }
+    if (config.table) {
+      config.tables.push(config.table);
+    }
+    if (config.view) {
+      config.views.push(config.view);
+    }
+
+    if (!config.casesensitive) {
+      config.tables = config.tables.map(name => name.toLowerCase());
+      config.views = config.views.map(name => name.toLowerCase());
+    }
+
     config.db = wd.open(config);
     config.exportSql = config.exportSql || [];
-    config.exportSql.toString = function() {
-      return this.join(config.linebreaks ? ";\n" : "; ") + ";";
-    };
-    if (config.table) {
-      wd.exportTable(config);
-    } else {
-      config.exported = []; // list of exported tables
-      config.outstanding = []; // list of outstanding tables
-      var success = config.success;
-      config.success = function() {
-        config.exported.push(config.table);
-        // Check if its all done
-        if (config.exported.length >= config.outstanding.length) {
-          if (typeof success === "function")
-            success(config.exportSql.toString());
+
+    var success = config.success;
+    config.success = function() {
+      config.exported++;
+      // Check if its all done
+      if (config.exported >= config.outstanding.length) {
+        if (typeof success === "function") {
+          success(config.exportSql);
         }
-      };
-      // Export all tables in db
-      wd.execute({
-        db: config.db,
-        sql: "SELECT tbl_name FROM sqlite_master WHERE type='table';",
-        success: function(results) {
-          if (results.rows) {
-            // First count the outstanding tables
-            var tbl_name;
-            for (var i = 0; i < results.rows.length; i++) {
-              tbl_name = results.rows.item(i)["tbl_name"];
-              if (tbl_name.indexOf("__WebKit") !== 0)
-                // skip webkit internals
-                config.outstanding.push(tbl_name);
-            }
-            // Then export them
-            for (var i = 0; i < config.outstanding.length; i++) {
-              config.table = config.outstanding[i];
-              wd.exportTable(config);
+      }
+    };
+
+    // Export all tables in db
+    wd.execute({
+      db: config.db,
+      sql: `
+        SELECT type, tbl_name FROM sqlite_master WHERE type='table'
+        UNION
+        SELECT type, tbl_name FROM sqlite_master WHERE type='view'
+        ;
+      `,
+      success: function(results) {
+        if (results.rows) {
+          config.exported = 0; // count of exported tables/views
+          config.outstanding = []; // list of outstanding tables/views
+          // First count the outstanding tables
+          for (let i = 0; i < results.rows.length; i++) {
+            var tbl_name = results.rows.item(i)["tbl_name"];
+            // skip webkit internals
+            if (tbl_name.indexOf("__WebKit") !== 0) {
+              const name = config.casesensitive
+                ? tbl_name
+                : tbl_name.toLowerCase();
+              const isInWhitelist =
+                (results.rows.item(i)["type"] === "view" &&
+                  (!config.views.length || config.views.includes(name))) ||
+                (results.rows.item(i)["type"] === "table" &&
+                  (!config.tables.length || config.tables.includes(name)));
+
+              if (isInWhitelist) {
+                config.outstanding.push({
+                  name: name,
+                  type: results.rows.item(i)["type"]
+                });
+              }
             }
           }
-        },
-        error: function(err) {
-          if (typeof error === "function") error(transaction, err);
+          // Then export them
+          for (let i = 0; i < config.outstanding.length; i++) {
+            if (config.outstanding[i].type === "table") {
+              wd.exportViewOrTable(
+                config,
+                config.outstanding[i].name,
+                config.outstanding[i].type
+              );
+            } else if (!config.dataonly) {
+              // It is assumed that views do not include any new information
+              wd.exportViewOrTable(
+                config,
+                config.outstanding[i].name,
+                config.outstanding[i].type
+              );
+            }
+          }
         }
-      });
-    }
+      },
+      error: function(err) {
+        if (typeof error === "function") error(transaction, err);
+      }
+    });
   };
 
   wd.open = function(config) {
     if (!config) throw new Error("Please use a config object");
-    if (!config.database)
+    if (!config.database) {
       throw new Error("Please define a config database name.");
+    }
     return window.openDatabase(
       config.database,
       config.version || "1.0",
@@ -154,8 +198,9 @@
   // Helper method for executing SQL code in DB
   wd.execute = function(config) {
     if (!config) throw new Error("Please use a config object");
-    if (!config.db)
+    if (!config.db) {
       throw new Error("Please define a db obj to execute against");
+    }
     if (!config.sql) throw new Error("Please define some sql to execute.");
     config.db.transaction(function(transaction) {
       transaction.executeSql(

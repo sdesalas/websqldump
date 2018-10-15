@@ -40,11 +40,12 @@
         params: [name],
         success: function(results) {
           if (!results.rows || !results.rows.length) {
-            if (typeof config.error === "function")
-              config.error("No such table: " + table);
+            if (typeof config.error === "function") {
+              config.error(`No such ${type}: ${name}`);
+            }
             return;
           }
-          config.exportSql.push(results.rows.item(0)["sql"]);
+          config.exportSql.push(results.rows.item(0)["sql"] + ";");
           if (config.schemaonly || type === "view") {
             if (typeof config.success === "function") {
               config.success(config.exportSql);
@@ -72,17 +73,18 @@
               }
               config.exportSql.push(
                 "INSERT INTO " +
-                  table +
+                  name +
                   "(" +
                   _fields.join(",") +
                   ") VALUES (" +
                   _values.join(",") +
-                  ")"
+                  ");"
               );
             }
           }
-          if (typeof config.success === "function")
-            config.success(config.exportSql.toString());
+          if (typeof config.success === "function") {
+            config.success(config.exportSql);
+          }
         },
         error: function(err) {
           if (typeof config.error === "function") config.error(err);

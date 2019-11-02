@@ -26,6 +26,6 @@
   "homepage": "https://github.com/sdesalas/websqldump#readme",
   "devDependencies": {
     "node-static": "^0.7.9",
-    "open": "0.0.5"
+    "open": "7.0.0"
   }
 }
